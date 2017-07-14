@@ -5,9 +5,10 @@ const barChart = require('../index.js');
 
 describe('#barChart', function() {
   const svg = barChart.svg;
-  it('should return empty chart when given no data', function() {
-    const result = svg({});
-    expect(result).to.equal('<svg></svg>');
+  it('should return an svg when given empty data', function() {
+    const result = svg([]);
+    expect(result).to.match(/^<svg xmlns/);
+    expect(result).to.match(/<\/svg>$/);
   });
 });
 

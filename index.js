@@ -1,10 +1,11 @@
 'use strict';
 
-const svgOpenTag = '<svg>';
+const svgOpenTag = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">';
 const svgCloseTag = '</svg>';
 
 function svg(data) {
-  return `${svgOpenTag}${svgCloseTag}`;
+  const rects = makeRects(data);
+  return `${svgOpenTag}${rects}${svgCloseTag}`;
 }
 
 /* get x-offset of bar a zero-based index */
@@ -34,10 +35,25 @@ function getBars(data) {
   });
 }
 
+function makeRectTag(x, y, height, width, stroke, fill) {
+  const rectTag = `<rect x="${x}" y="${y}" \
+    height="${height}" width="${width}" \
+    style="stroke: ${stroke}; fill: ${fill};"/>`;
+  return rectTag;
+}
+
+function makeRects(data) {
+  getBars(data).map((bar) => {
+    return makeRectTag(bar.offset, 0, bar.height, bar.width, '#333', 'ccc');
+  });
+}
+
 /* Create a bar chart SVG */
 module.exports = {
   getBarOffset,
   getBarHeight,
   getBars,
+  makeRectTag,
+  makeRects,
   svg,
 };

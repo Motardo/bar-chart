@@ -1,4 +1,5 @@
 const express = require('express');
+// Note: require('@motardo/bar-chart') when using in your own project
 const barChart = require('./index.js');
 
 const app = express();
@@ -15,7 +16,10 @@ app.get('/', (req, res) => {
     fill: ['#b88'],
   };
   const chart = barChart.svg(data, config);
-  res.send(chart); // in real life the chart would be included in a proper html 5 document
+  /* in real life the chart would be included in a proper html 5 document
+   * but for this demo we just send the chart by itself
+   */
+  res.send(chart);
 });
 
 app.listen(3000);

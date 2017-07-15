@@ -25,6 +25,7 @@ const config = {
 const chart = barChart.svg(data, config);
 ```
 The output is the `<svg>` string for drawing the chart. It will look like this:
+
 ![bar chart](demo.png "demo bar chart")
 
 ## Express Demo

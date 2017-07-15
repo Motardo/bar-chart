@@ -21,7 +21,7 @@ npm i @motardo/bar-chart express
 ```
 
 Create `index.js`
-```
+```js
 // index.js
 const express =  require('express');
 const barChart = require('../bar-chart/index.js');

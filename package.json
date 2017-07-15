@@ -4,7 +4,7 @@
   "description": "Create a bar chart SVG",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --reporter spec --watch"
+    "test": "mocha --reporter spec"
   },
   "repository": {
     "type": "git",

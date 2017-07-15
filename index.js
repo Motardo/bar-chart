@@ -1,11 +1,35 @@
 'use strict';
 
-const svgOpenTag = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">';
-const svgCloseTag = '</svg>';
+/**
+ * @param {Array} data
+ * @param {Object} config
+ *
+ * @return {string} svg markup for chart
+ *
+ * data is an array of magnitudes
+ * config Object properties are:
+ *  - attributes (array of strings to include in svg tag)
+ *    for example ['viewBox="0 0 100 100"', 'transform="rotate(90)"']
+ *  - stroke (array of color strings)
+ *    for example ['#abc89d', '#0F0']
+ *  - fill (array of color strings)
+ *    for example ['#abc89d', 'blue' 'green']
+ *  - labels (array of Objects with text and position properties)
+ */
 
-function svg(data) {
-  const rects = makeRects(data);
+function svg(data = [], config = {}) {
+  const svgCloseTag = '</svg>';
+  const rects = makeRects(data, config);
+  const svgOpenTag = openSvg(config.attributes);
   return `${svgOpenTag}${rects}${svgCloseTag}`;
+}
+
+function openSvg(attributes = []) {
+  const preamble = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"';
+  attributes.push('>');
+  return attributes.reduce((acc, attribute) => {
+    return `${acc} ${attribute}`;
+  }, preamble);
 }
 
 /* get x-offset of bar a zero-based index */
@@ -42,9 +66,14 @@ function makeRectTag(x, y, height, width, stroke, fill) {
   return rectTag;
 }
 
-function makeRects(data) {
-  getBars(data).map((bar) => {
-    return makeRectTag(bar.offset, 0, bar.height, bar.width, '#333', 'ccc');
+function makeRects(data, config) {
+  const stroke = config.stroke || ['#fff'];
+  const fill = config.fill || ['#ddd'];
+
+  return getBars(data).map((bar, index) => {
+    const nextStroke = stroke[index % stroke.length];
+    const nextFill = fill[index % fill.length];
+    return makeRectTag(bar.offset, 100 - bar.height, bar.height, bar.width, nextStroke, nextFill);
   });
 }
 

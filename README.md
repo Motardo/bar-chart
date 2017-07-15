@@ -14,42 +14,14 @@ const chart = barChart.svg(data);
 The output is the `<svg>` string for drawing the chart
 
 ## Example with Express
+To run the demo:
 ```sh
-mkdir myApp && cd myApp
-npm init -y
-npm i @motardo/bar-chart express
+git clone git@github.com:Motardo/bar-chart.git
+cd bar-chart && npm install
+node demo.js
 ```
 
-Create `index.js`
-```js
-// index.js
-const express =  require('express');
-const barChart = require('../bar-chart/index.js');
-
-const app = express();
-
-app.get('/', (req, res) => {
-  const data = [3.14, 4.54, 2.72, 4, 3.33];
-  const config = {
-    attributes: [
-      'viewBox="0 0 100 100"', // the chart base image is 100 by 100 square
-      'transform="rotate(90)"' // make a sideways chart
-    ],
-    fill: ['red', 'blue'] // alternate red and blue
-  };
-  const chart = barChart.svg(data, config);
-  res.send(chart); // in real life the chart would be included in a proper html 5 document
-});
-
-app.listen(3000);
-```
-
-Then run the app
-```sh
-node index.js
-```
-
-And visit `localhost:3000` in a web browser to see the chart.
+And visit `localhost:3000` in a web browser to see the example chart.
 
 ## API
 The module exposes one method `svg` which takes an array of numbers for data to
@@ -57,6 +29,14 @@ construct the bar chart. An optional `config` object may be given as a second pa
 
 ### Config
 Properties may include:
- - `attributes`: an array of strings to include in the svg tag
- - `fill`: an array of strings representing fill colors to cycle through for each bar
+ - `attributes`: an object with three porpoerties
+   * `chart`: an array of attributes to include in the outer svg tag
+   * `bars`: an array of attributes to apply to the bars as a group
+   * `labels`: like `bars` but for the labels as a group
+ - `fill`: an array of strings representing fill colors to cycle through for each bar (default is `["#ccc"]`)
  - `stroke`: like `fill`, but for the stroke colors
+ - `labels`: an array of strings to label the data
+ - `labelOptions`: an object to configure the label appearance
+   * `fontSize`: default is `"10px"`
+   * `rotate`: default is `60`
+   * `padding`: default is `7`

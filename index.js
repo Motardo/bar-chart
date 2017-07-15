@@ -18,18 +18,31 @@
  */
 
 function svg(data = [], config = {}) {
-  const svgCloseTag = '</svg>';
-  const rects = makeRects(data, config);
-  const svgOpenTag = openSvg(config.attributes);
-  return `${svgOpenTag}${rects}${svgCloseTag}`;
+  // map each datum into an object containing a text and rect tag
+  const tags = makeTags(data, config);
+  // unzip the text and rect tags into their own arrays
+  const {textTags, rectTags} = tags.reduce((acc, dataPoint) => {
+    acc.textTags.push(dataPoint.textTag);
+    acc.rectTags.push(dataPoint.rectTag);
+    return acc;
+  }, {textTags: [], rectTags: []});
+  const bars = makeTag('g', rectTags, config.attributes.bars);
+  const labels = makeTag('g', textTags, config.attributes.labels);
+  return svgTag(`${bars}${labels}`, config.attributes.chart);
 }
 
-function openSvg(attributes = []) {
-  const preamble = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"';
+function svgTag(inner, attributes = []) {
+  const namespace = 'xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"';
+  attributes.unshift(namespace);
+  return makeTag('svg', inner, attributes);
+}
+
+function makeTag(type, inner, attributes = []) {
   attributes.push('>');
-  return attributes.reduce((acc, attribute) => {
+  const openTag = attributes.reduce((acc, attribute) => {
     return `${acc} ${attribute}`;
-  }, preamble);
+  }, `<${type}`);
+  return `${openTag}${inner}</${type}>`;
 }
 
 /* get x-offset of bar a zero-based index */
@@ -66,15 +79,34 @@ function makeRectTag(x, y, height, width, stroke, fill) {
   return rectTag;
 }
 
-function makeRects(data, config) {
+function makeTags(data, config) {
   const stroke = config.stroke || ['#fff'];
-  const fill = config.fill || ['#ddd'];
+  const fill = config.fill || ['#ccc'];
+  const labels = config.labels || [];
+  const labelOptions = config.labelOptions || {};
+  const makeTextTag = labelBelow;
+  let textTag = '';
 
   return getBars(data).map((bar, index) => {
     const nextStroke = stroke[index % stroke.length];
     const nextFill = fill[index % fill.length];
-    return makeRectTag(bar.offset, 100 - bar.height, bar.height, bar.width, nextStroke, nextFill);
+    const rectTag = makeRectTag(bar.offset, 100 - bar.height, bar.height, bar.width, nextStroke, nextFill);
+    if (labels[index]) {
+      textTag = makeTextTag(bar.offset, labels[index], labelOptions);
+    }
+    return {textTag, rectTag};
   });
+}
+
+// <text x="5" y="105" font-size="8px" transform="rotate(50 5,105)">Superman</text>
+function labelBelow(offset, label, config = {}) {
+  const fontSize = (config || {}).fontSize || "8px";
+  const rotate = (config || {}).rotate || 60;
+  const x = offset + ((config || {}).padding || 7);
+  const y = 105;
+
+  return `<text x="${x}" y="${y}" font-size="${fontSize}" \
+  transform="rotate(${rotate} ${x},${y})">${label}</text>`;
 }
 
 /* Create a bar chart SVG */
@@ -83,6 +115,6 @@ module.exports = {
   getBarHeight,
   getBars,
   makeRectTag,
-  makeRects,
+  makeTags,
   svg,
 };

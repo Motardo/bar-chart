@@ -24,7 +24,8 @@ const config = {
 };
 const chart = barChart.svg(data, config);
 ```
-The output is the `<svg>` string for drawing the chart
+The output is the `<svg>` string for drawing the chart. It will look like this:
+![bar chart](demo.png "demo bar chart")
 
 ## Express Demo
 To run the demo:
@@ -43,7 +44,7 @@ construct the bar chart. An optional `config` object may be given as a second pa
 
 ### Config
 Properties may include:
- - `attributes`: an object with three porpoerties
+ - `attributes`: an object with three properties
    * `chart`: an array of attributes to include in the outer svg tag
    * `bars`: an array of attributes to apply to the bars as a group
    * `labels`: like `bars` but for the labels as a group

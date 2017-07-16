@@ -26,9 +26,9 @@ function svg(data = [], config = {}) {
     acc.rectTags.push(dataPoint.rectTag);
     return acc;
   }, {textTags: [], rectTags: []});
-  const bars = makeTag('g', rectTags, config.attributes.bars);
-  const labels = makeTag('g', textTags, config.attributes.labels);
-  return svgTag(`${bars}${labels}`, config.attributes.chart);
+  const bars = makeTag('g', rectTags, (config.attributes || {}).bars);
+  const labels = makeTag('g', textTags, (config.attributes || {}).labels);
+  return svgTag(`${bars}${labels}`, (config.attributes || {}).chart);
 }
 
 function svgTag(inner, attributes = []) {

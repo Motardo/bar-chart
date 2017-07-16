@@ -1,6 +1,6 @@
 {
   "name": "@motardo/bar-chart",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Create a bar chart SVG",
   "main": "index.js",
   "scripts": {

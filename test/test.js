@@ -48,16 +48,19 @@ describe('#getBars', function() {
 
   it('should handle a single data point', function() {
     expect(getBars([0])).to.eql([{
+      magnitude: 0,
       height: 0,
       width: 100,
       offset: 0,
     }]);
     expect(getBars([1])).to.eql([{
+      magnitude: 1,
       height: 100,
       width: 100,
       offset: 0,
     }]);
     expect(getBars([5])).to.eql([{
+      magnitude: 5,
       height: 100,
       width: 100,
       offset: 0,
@@ -66,10 +69,10 @@ describe('#getBars', function() {
 
   it('should handle multiple points', function() {
     expect(getBars([0, 1, 0, 2])).to.eql([
-      {height: 0, width: 25, offset: 0},
-      {height: 50, width: 25, offset: 25},
-      {height: 0, width: 25, offset: 50},
-      {height: 100, width: 25, offset: 75},
+      {magnitude: 0, height: 0, width: 25, offset: 0},
+      {magnitude: 1, height: 50, width: 25, offset: 25},
+      {magnitude: 0, height: 0, width: 25, offset: 50},
+      {magnitude: 2, height: 100, width: 25, offset: 75},
     ]);
   });
 });

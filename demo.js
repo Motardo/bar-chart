@@ -9,11 +9,28 @@ app.get('/', (req, res) => {
   const config = {
     attributes: {
       chart: [
-        'viewBox="0 0 120 240"', // the base image of the bars is 100 by 100 square
+        // the base image of the bars is 100 by 100 square
+        'viewBox="0 0 120 150"',
+      ],
+      bars: [
+        'transform="translate(0,10)"',
+      ],
+      labels: [
+        'transform="translate(0,10)"',
+      ],
+      yLabels: [
+        'transform="translate(2,10)"',
+        'fontSize="6px"',
       ],
     },
     labels: ['Superman', 'Batman', 'Godzilla', 'Elmo', 'Thor'],
     fill: ['#b88'],
+    barDecorationOptions: {
+      fontSize: '6px',
+    },
+    labelOptions: {
+      rotate: 60,
+    },
   };
   const chart = barChart.svg(data, config);
   /* in real life the chart would be included in a proper html 5 document

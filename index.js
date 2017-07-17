@@ -14,21 +14,23 @@
  *    for example ['#abc89d', '#0F0']
  *  - fill (array of color strings)
  *    for example ['#abc89d', 'blue' 'green']
- *  - labels (array of Objects with text and position properties)
+ *  - labels (array of strings to label the x axis)
  */
 
 function svg(data = [], config = {}) {
   // map each datum into an object containing a text and rect tag
   const tags = makeTags(data, config);
   // unzip the text and rect tags into their own arrays
-  const {textTags, rectTags} = tags.reduce((acc, dataPoint) => {
+  const {textTags, rectTags, yLabelTags} = tags.reduce((acc, dataPoint) => {
     acc.textTags.push(dataPoint.textTag);
     acc.rectTags.push(dataPoint.rectTag);
+    acc.yLabelTags.push(dataPoint.yLabelTag);
     return acc;
-  }, {textTags: [], rectTags: []});
+  }, {textTags: [], rectTags: [], yLabelTags: []});
   const bars = makeTag('g', rectTags, (config.attributes || {}).bars);
   const labels = makeTag('g', textTags, (config.attributes || {}).labels);
-  return svgTag(`${bars}${labels}`, (config.attributes || {}).chart);
+  const yLabels = makeTag('g', yLabelTags, (config.attributes || {}).yLabels);
+  return svgTag(`${bars}${labels}${yLabels}`, (config.attributes || {}).chart);
 }
 
 function svgTag(inner, attributes = []) {
@@ -65,6 +67,7 @@ function getBars(data) {
 
   return data.map((magnitude, index) => {
     return {
+      magnitude,
       height: getBarHeight(magnitude, maximum),
       width,
       offset: getBarOffset(index, totalBars),
@@ -72,7 +75,12 @@ function getBars(data) {
   });
 }
 
-function makeRectTag(x, y, height, width, stroke, fill) {
+function makeRectTag(bar, stroke, fill) {
+  const x = bar.offset;
+  const y = 100 - bar.height;
+  const height = bar.height;
+  const width = bar.width;
+
   const rectTag = `<rect x="${x}" y="${y}" \
     height="${height}" width="${width}" \
     style="stroke: ${stroke}; fill: ${fill};"/>`;
@@ -84,25 +92,42 @@ function makeTags(data, config) {
   const fill = config.fill || ['#ccc'];
   const labels = config.labels || [];
   const labelOptions = config.labelOptions || {};
+  const barDecorationOptions = config.barDecorationOptions || {};
   const makeTextTag = labelBelow;
   let textTag = '';
+  let yLabelTag = '';
 
   return getBars(data).map((bar, index) => {
     const nextStroke = stroke[index % stroke.length];
     const nextFill = fill[index % fill.length];
-    const rectTag = makeRectTag(bar.offset, 100 - bar.height, bar.height, bar.width, nextStroke, nextFill);
+    const rectTag = makeRectTag(bar, nextStroke, nextFill);
     if (labels[index]) {
       textTag = makeTextTag(bar.offset, labels[index], labelOptions);
     }
-    return {textTag, rectTag};
+    if (config.barDecoration !== false) {
+      const barDecoration = config.barDecoration || numberAbove;
+      yLabelTag = barDecoration(bar, index, barDecorationOptions);
+    }
+    return {textTag, rectTag, yLabelTag};
   });
 }
 
-// <text x="5" y="105" font-size="8px" transform="rotate(50 5,105)">Superman</text>
+function numberAbove(bar, index, config = {}) {
+  const x = bar.offset;
+  const y = 100 - bar.height;
+  const fontSize = (config || {}).fontSize || '8px';
+
+  return `<text x="${x}" y="${y}" font-size="${fontSize}"> \
+  ${bar.magnitude}</text>`;
+}
+
+// <text x="5" y="105" font-size="8px" transform="rotate(50 5,105)">
+// Superman</text>
 function labelBelow(offset, label, config = {}) {
-  const fontSize = (config || {}).fontSize || "8px";
-  const rotate = (config || {}).rotate || 60;
-  const x = offset + ((config || {}).padding || 7);
+  const fontSize = (config || {}).fontSize || '8px';
+  const rotate = (config || {}).rotate || 90;
+  // half of the bar width, then back 1/4 the font size
+  const x = offset + ((config || {}).padding || 8);
   const y = 105;
 
   return `<text x="${x}" y="${y}" font-size="${fontSize}" \

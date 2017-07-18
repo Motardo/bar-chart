@@ -21,16 +21,26 @@ function svg(data = [], config = {}) {
   // map each datum into an object containing a text and rect tag
   const tags = makeTags(data, config);
   // unzip the text and rect tags into their own arrays
-  const {textTags, rectTags, yLabelTags} = tags.reduce((acc, dataPoint) => {
-    acc.textTags.push(dataPoint.textTag);
-    acc.rectTags.push(dataPoint.rectTag);
-    acc.yLabelTags.push(dataPoint.yLabelTag);
-    return acc;
-  }, {textTags: [], rectTags: [], yLabelTags: []});
+  const {textTags, rectTags, barDecorationTags} = tags.reduce(
+    (acc, dataPoint) => {
+      acc.textTags.push(dataPoint.textTag);
+      acc.rectTags.push(dataPoint.rectTag);
+      acc.barDecorationTags.push(dataPoint.barDecorationTag);
+      return acc;
+    },
+    {textTags: [], rectTags: [], barDecorationTags: []}
+  );
   const bars = makeTag('g', rectTags, (config.attributes || {}).bars);
   const labels = makeTag('g', textTags, (config.attributes || {}).labels);
-  const yLabels = makeTag('g', yLabelTags, (config.attributes || {}).yLabels);
-  return svgTag(`${bars}${labels}${yLabels}`, (config.attributes || {}).chart);
+  const barDecorations = makeTag(
+    'g',
+    barDecorationTags,
+    (config.attributes || {}).barDecorations
+  );
+  return svgTag(
+    `${bars}${labels}${barDecorations}`,
+    (config.attributes || {}).chart
+  );
 }
 
 function svgTag(inner, attributes = []) {
@@ -95,7 +105,7 @@ function makeTags(data, config) {
   const barDecorationOptions = config.barDecorationOptions || {};
   const makeTextTag = labelBelow;
   let textTag = '';
-  let yLabelTag = '';
+  let barDecorationTag = '';
 
   return getBars(data).map((bar, index) => {
     const nextStroke = stroke[index % stroke.length];
@@ -104,11 +114,18 @@ function makeTags(data, config) {
     if (labels[index]) {
       textTag = makeTextTag(bar.offset, labels[index], labelOptions);
     }
-    if (config.barDecoration !== false) {
-      const barDecoration = config.barDecoration || numberAbove;
-      yLabelTag = barDecoration(bar, index, barDecorationOptions);
+    let barDecoration = config.barDecoration;
+    if (typeof barDecoration !== 'function') {
+      if (barDecoration === 'above') {
+        barDecoration = numberAbove;
+      } else {
+        barDecoration = false;
+      }
     }
-    return {textTag, rectTag, yLabelTag};
+    if (barDecoration) {
+      barDecorationTag = barDecoration(bar, index, barDecorationOptions);
+    }
+    return {textTag, rectTag, barDecorationTag};
   });
 }
 

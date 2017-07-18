@@ -18,18 +18,19 @@ app.get('/', (req, res) => {
       labels: [
         'transform="translate(0,10)"',
       ],
-      yLabels: [
+      barDecorations: [
         'transform="translate(2,10)"',
         'fontSize="6px"',
       ],
     },
     labels: ['Superman', 'Batman', 'Godzilla', 'Elmo', 'Thor'],
     fill: ['#b88'],
+    barDecoration: 'above',
     barDecorationOptions: {
       fontSize: '6px',
     },
     labelOptions: {
-      rotate: 60,
+      rotate: 45,
     },
   };
   const chart = barChart.svg(data, config);

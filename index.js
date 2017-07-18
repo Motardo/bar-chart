@@ -142,7 +142,7 @@ function numberAbove(bar, index, config = {}) {
 // Superman</text>
 function labelBelow(offset, label, config = {}) {
   const fontSize = (config || {}).fontSize || '8px';
-  const rotate = (config || {}).rotate || 90;
+  const rotate = (config || {}).rotate || 60;
   // half of the bar width, then back 1/4 the font size
   const x = offset + ((config || {}).padding || 8);
   const y = 105;
